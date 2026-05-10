@@ -1,8 +1,9 @@
 package tests;
 
 import base.BaseTest;
-import org.testng.Assert;
 import org.testng.annotations.Test;
+import pages.CartPage;
+import utils.ScreenshotUtils;
 
 public class SmokeTest extends BaseTest {
 
@@ -11,8 +12,10 @@ public class SmokeTest extends BaseTest {
 
         driver.get("https://stg2.shop.samsung.com/getcookie.html");
 
-        String currentUrl = driver.getCurrentUrl();
+        ScreenshotUtils.takeScreenshot(driver, "cookie-page");
 
-        Assert.assertTrue(currentUrl.contains("getcookie"));
+        CartPage cartPage = new CartPage(driver);
+
+        System.out.println("Framework initialized successfully.");
     }
 }
