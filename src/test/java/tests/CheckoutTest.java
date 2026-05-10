@@ -25,6 +25,15 @@ public class CheckoutTest extends BaseTest {
         );
 
         driver.get(
+                ConfigReader.getProperty("add.to.cart.url")
+        );
+
+        ScreenshotUtils.takeScreenshot(
+                driver,
+                "product-added-to-cart"
+        );
+
+        driver.get(
                 ConfigReader.getProperty("cart.url")
         );
 
