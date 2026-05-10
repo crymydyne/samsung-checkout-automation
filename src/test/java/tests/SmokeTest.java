@@ -1,21 +1,32 @@
 package tests;
 
 import base.BaseTest;
+import config.ConfigReader;
+import org.testng.Assert;
 import org.testng.annotations.Test;
-import pages.CartPage;
 import utils.ScreenshotUtils;
 
 public class SmokeTest extends BaseTest {
 
     @Test
-    public void shouldOpenSamsungPage() {
+    public void shouldInitializeSamsungSession() {
 
-        driver.get("https://stg2.shop.samsung.com/getcookie.html");
+        String url =
+                ConfigReader.getProperty("cookie.url");
 
-        ScreenshotUtils.takeScreenshot(driver, "cookie-page");
+        driver.get(url);
 
-        CartPage cartPage = new CartPage(driver);
+        ScreenshotUtils.takeScreenshot(
+                driver,
+                "cookie-page"
+        );
 
-        System.out.println("Framework initialized successfully.");
+        String pageSource =
+                driver.getPageSource();
+
+        Assert.assertTrue(
+                pageSource.contains("access"),
+                "Cookie initialization page did not load correctly."
+        );
     }
 }

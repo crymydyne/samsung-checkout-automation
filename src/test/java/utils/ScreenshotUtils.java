@@ -7,20 +7,33 @@ import org.openqa.selenium.WebDriver;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class ScreenshotUtils {
 
     public static void takeScreenshot(WebDriver driver, String fileName) {
 
+        String timestamp =
+                LocalDateTime.now()
+                        .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+
         File screenshot = ((TakesScreenshot) driver)
                 .getScreenshotAs(OutputType.FILE);
 
-        File destination = new File("screenshots/" + fileName + ".png");
+        File destination =
+                new File("screenshots/" +
+                        fileName +
+                        "_" +
+                        timestamp +
+                        ".png");
 
         try {
+
             FileUtils.copyFile(screenshot, destination);
 
         } catch (IOException e) {
+
             e.printStackTrace();
         }
     }
