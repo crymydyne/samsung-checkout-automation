@@ -1,0 +1,17 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="Samsung Automation Suite">
+
+    <test name="Checkout Flow Tests">
+
+        <classes>
+
+            <class name="tests.SmokeTest"/>
+
+            <class name="tests.CheckoutTest"/>
+
+        </classes>
+
+    </test>
+
+</suite>

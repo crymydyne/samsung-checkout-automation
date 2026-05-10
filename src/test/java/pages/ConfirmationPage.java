@@ -8,7 +8,11 @@ public class ConfirmationPage extends BasePage {
     private final By successMessage =
             By.tagName("body");
 
+    private final By orderNumber =
+            By.cssSelector(".order-number");
+
     public ConfirmationPage(WebDriver driver) {
+
         super(driver);
     }
 
@@ -16,5 +20,10 @@ public class ConfirmationPage extends BasePage {
 
         return getText(successMessage)
                 .contains("Order");
+    }
+
+    public String getOrderNumber() {
+
+        return getText(orderNumber);
     }
 }

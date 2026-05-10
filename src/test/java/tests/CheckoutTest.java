@@ -15,14 +15,18 @@ public class CheckoutTest extends BaseTest {
     @Test
     public void shouldCompleteGuestCheckout() {
 
+        System.out.println("STEP: Initializing session");
+
         driver.get(
                 ConfigReader.getProperty("cookie.url")
         );
 
         ScreenshotUtils.takeScreenshot(
                 driver,
-                "cookie-session"
+                "01-cookie-page"
         );
+
+        System.out.println("STEP: Adding product to cart");
 
         driver.get(
                 ConfigReader.getProperty("add.to.cart.url")
@@ -30,17 +34,38 @@ public class CheckoutTest extends BaseTest {
 
         ScreenshotUtils.takeScreenshot(
                 driver,
-                "product-added-to-cart"
+                "02-product-added"
         );
+
+        System.out.println("STEP: Opening cart page");
 
         driver.get(
                 ConfigReader.getProperty("cart.url")
         );
 
+        ScreenshotUtils.takeScreenshot(
+                driver,
+                "03-cart-page"
+        );
+
         CartPage cartPage =
                 new CartPage(driver);
 
+        Assert.assertTrue(
+                cartPage.isProductInCart(
+                        "RB45DG6300B1PE"
+                ),
+                "SKU was not found in cart."
+        );
+
+        System.out.println("STEP: Proceeding to checkout");
+
         cartPage.clickContinue();
+
+        ScreenshotUtils.takeScreenshot(
+                driver,
+                "04-guest-page"
+        );
 
         GuestPage guestPage =
                 new GuestPage(driver);
@@ -48,16 +73,43 @@ public class CheckoutTest extends BaseTest {
         String email =
                 TestDataGenerator.generateUniqueEmail();
 
+        System.out.println(
+                "Generated email: " + email
+        );
+
         guestPage.enterEmail(email);
 
         guestPage.continueAsGuest();
 
+        ScreenshotUtils.takeScreenshot(
+                driver,
+                "05-checkout-page"
+        );
+
         CheckoutPage checkoutPage =
                 new CheckoutPage(driver);
+
+        System.out.println(
+                "STEP: Filling personal information"
+        );
 
         checkoutPage.fillPersonalInformation(
                 TestCustomerData.FULL_NAME,
                 TestCustomerData.PHONE
+        );
+
+        Assert.assertTrue(
+                checkoutPage.isAddressSectionEnabled(),
+                "Address section was not enabled."
+        );
+
+        ScreenshotUtils.takeScreenshot(
+                driver,
+                "06-personal-information"
+        );
+
+        System.out.println(
+                "STEP: Filling address information"
         );
 
         checkoutPage.fillAddress(
@@ -66,10 +118,33 @@ public class CheckoutTest extends BaseTest {
                 TestCustomerData.ZIP
         );
 
+        ScreenshotUtils.takeScreenshot(
+                driver,
+                "07-address-information"
+        );
+
+        System.out.println(
+                "STEP: Selecting delivery mode"
+        );
+
         checkoutPage.selectDeliveryMode();
+
+        Assert.assertTrue(
+                checkoutPage.isDeliveryModeSelected(),
+                "Delivery mode was not selected."
+        );
+
+        ScreenshotUtils.takeScreenshot(
+                driver,
+                "08-delivery-mode"
+        );
 
         PaymentPage paymentPage =
                 new PaymentPage(driver);
+
+        System.out.println(
+                "STEP: Entering payment information"
+        );
 
         paymentPage.enterCardDetails(
                 TestCardData.CARD_NUMBER,
@@ -79,7 +154,11 @@ public class CheckoutTest extends BaseTest {
 
         ScreenshotUtils.takeScreenshot(
                 driver,
-                "before-order-placement"
+                "09-payment-page"
+        );
+
+        System.out.println(
+                "STEP: Placing order"
         );
 
         paymentPage.placeOrder();
@@ -92,9 +171,22 @@ public class CheckoutTest extends BaseTest {
                 "Order confirmation was not displayed."
         );
 
+        String orderNumber =
+                confirmationPage.getOrderNumber();
+
+        System.out.println(
+                "Generated Order Number: "
+                        + orderNumber
+        );
+
+        Assert.assertFalse(
+                orderNumber.isEmpty(),
+                "Order number was not generated."
+        );
+
         ScreenshotUtils.takeScreenshot(
                 driver,
-                "order-confirmation"
+                "10-order-confirmation"
         );
     }
 }

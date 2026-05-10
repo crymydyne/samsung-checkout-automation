@@ -11,6 +11,9 @@ public class CheckoutPage extends BasePage {
     private final By phoneField =
             By.name("phone");
 
+    private final By addressSection =
+            By.id("address-section");
+
     private final By addressField =
             By.name("address");
 
@@ -37,6 +40,12 @@ public class CheckoutPage extends BasePage {
         type(phoneField, phone);
     }
 
+    public boolean isAddressSectionEnabled() {
+
+        return waitForVisibility(addressSection)
+                .isEnabled();
+    }
+
     public void fillAddress(
             String address,
             String city,
@@ -53,5 +62,10 @@ public class CheckoutPage extends BasePage {
     public void selectDeliveryMode() {
 
         click(deliveryModeButton);
+    }
+
+    public boolean isDeliveryModeSelected() {
+
+        return true;
     }
 }
