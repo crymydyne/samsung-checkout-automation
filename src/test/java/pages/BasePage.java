@@ -26,6 +26,14 @@ public class BasePage {
         return wait.until(ExpectedConditions.elementToBeClickable(locator));
     }
 
+    protected void waitForPageLoad() {
+
+        wait.until(driver ->
+                ((org.openqa.selenium.JavascriptExecutor) driver)
+                        .executeScript("return document.readyState")
+                        .equals("complete"));
+    }
+
     protected void click(By locator) {
         waitForClickability(locator).click();
     }
