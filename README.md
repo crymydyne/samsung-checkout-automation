@@ -4,36 +4,39 @@
 
 This project is an automation framework created for the Samsung ecommerce checkout assignment.
 
-The main objective is to automate the checkout flow in Samsung's staging ecommerce environment, validating that a customer can:
+The objective is to automate the customer checkout flow in Samsung's staging ecommerce environment, validating that a customer can:
 
-* Add a SKU to the cart
-* Proceed through checkout as a Guest user
-* Fill personal information
-* Fill address information
-* Select delivery mode
-* Complete payment using test credit cards
-* Validate successful order placement
-* Capture the generated order number
+- Add a SKU to the cart
+- Proceed through checkout as a Guest user
+- Fill personal information
+- Fill address information
+- Select delivery mode
+- Complete payment using test credit cards
+- Validate successful order placement
+- Capture the generated order number
+
+The framework was developed using Selenium WebDriver with Java and follows the Page Object Model (POM) architecture.
 
 ---
 
 # Technologies Used
 
-| Technology         | Purpose                                |
-| ------------------ | -------------------------------------- |
-| Java               | Programming language                   |
-| Selenium WebDriver | Browser automation                     |
-| TestNG             | Test execution framework               |
-| Maven              | Dependency management and build tool   |
-| WebDriverManager   | Automatic browser driver management    |
-| IntelliJ IDEA      | IDE used for development               |
-| Git + GitHub       | Version control and repository hosting |
+| Technology         | Purpose                             |
+|--------------------|-------------------------------------|
+| Java               | Programming language                |
+| Selenium WebDriver | Browser automation                  |
+| TestNG             | Test execution framework            |
+| Maven              | Dependency management               |
+| WebDriverManager   | Automatic browser driver setup      |
+| IntelliJ IDEA      | Development environment             |
+| Git + GitHub       | Version control                     |
+| Chrome DevTools    | Environment investigation/debugging |
 
 ---
 
 # Framework Architecture
 
-The framework follows a Page Object Model (POM) structure.
+The framework follows a Page Object Model (POM) design pattern to improve maintainability, scalability and readability.
 
 ## Project Structure
 
@@ -48,7 +51,6 @@ src/test/java
 │   └── ConfigReader.java
 │
 ├── models
-│   ├── Customer.java
 │   ├── TestCardData.java
 │   └── TestCustomerData.java
 │
@@ -62,49 +64,56 @@ src/test/java
 │
 ├── tests
 │   ├── SmokeTest.java
-│   └── CheckoutTest.java
+│   ├── CheckoutTest.java
+│   └── NegativeCheckoutTest.java
 │
 └── utils
     ├── ScreenshotUtils.java
     ├── TestDataGenerator.java
-    └── WaitUtils.java
+    └── ConfigReader.java
 ```
 
 ---
 
-# Implemented Features
+# Framework Features
 
-## Framework Features
+## Implemented Features
 
-* Selenium WebDriver integration
-* TestNG test execution
-* Page Object Model architecture
-* Centralized driver management
-* Reusable BasePage methods
-* Configurable environment URLs
-* Screenshot capture utility
-* Screenshot-on-failure support
-* Dynamic test data generation
-* Timestamped screenshots
-* Reusable waits
-* Structured test data models
+- Selenium WebDriver integration
+- TestNG test execution
+- Page Object Model architecture
+- Centralized driver management
+- Dynamic email generation using timestamp/UUID
+- Screenshot capture utility
+- Screenshot-on-failure support
+- Reusable wait methods
+- Reusable page actions
+- Configurable environment URLs
+- Structured test data models
+- Checkout flow abstraction
+- Negative scenario placeholders
+- Business requirement traceability
 
 ---
 
-# Test Flow
+# Business Flow Coverage
 
-The current automation flow is structured as follows:
+The framework was designed to cover the following business flow:
 
 ```text
-Initialize session cookies
+Initialize ecommerce session
 ↓
-Call add-to-cart endpoint
+Add SKU directly into cart using API endpoint
 ↓
 Open cart page
 ↓
+Validate SKU presence
+↓
 Proceed as guest user
 ↓
-Fill checkout information
+Fill personal information
+↓
+Validate address section enablement
 ↓
 Fill address information
 ↓
@@ -115,28 +124,27 @@ Enter payment information
 Place order
 ↓
 Validate confirmation page
+↓
+Capture order number
 ```
 
 ---
 
 # Environment Investigation
 
-Before implementing automation, a manual exploratory investigation was performed on the staging environment.
+Before implementing the automation flow, exploratory investigation was performed on the staging environment.
 
 ## Investigated URLs
 
-### Cookie Initialization
+### Cookie Initialization Page
 
 ```text
 https://stg2.shop.samsung.com/getcookie.html
 ```
 
 Purpose:
-
-* Initializes ecommerce session cookies
-* Establishes storefront session
-
----
+- Initializes ecommerce session cookies
+- Grants storefront access
 
 ### Add-To-Cart Endpoint
 
@@ -145,11 +153,10 @@ https://stg2.shop.samsung.com/pe/ng/p4v1/addToCart
 ```
 
 Purpose:
+- Adds the desired SKU directly into the cart session
+- Reduces UI dependency and improves execution stability
 
-* Adds SKU directly into the cart session
-* Allows faster and more stable checkout preparation
-
-Observed response:
+Observed Response:
 
 ```json
 {
@@ -158,8 +165,6 @@ Observed response:
 }
 ```
 
----
-
 ### Cart Page
 
 ```text
@@ -167,40 +172,146 @@ https://stg2.shop.samsung.com/pe/cart
 ```
 
 Purpose:
+- Opens the storefront cart page
+- Allows continuation into checkout
 
-* Opens ecommerce cart
-* Allows progression into checkout flow
+---
+
+# Execution Evidence
+
+## 01 — Session Initialization
+
+Description:
+
+The cookie initialization page was successfully loaded and session cookies were created.
+
+Evidence:
+
+![Cookie Page](screenshots/01-cookie-page.png)
+
+---
+
+## 02 — Product Added To Cart
+
+Description:
+
+The add-to-cart API endpoint successfully added the SKU into the cart session.
+
+Evidence:
+
+![Product Added](screenshots/02-product-added.png)
+
+---
+
+## 03 — Cart Page Access
+
+Description:
+
+The automation attempted to open the cart page after successful session initialization and cart insertion.
+
+The storefront rendered as a blank page due to backend/API communication failures in the staging environment.
+
+Evidence:
+
+![Cart Page](screenshots/03-cart-page.png)
+
+---
+
+## 04 — Browser Console Investigation
+
+Description:
+
+Chrome DevTools console logs revealed frontend/backend integration failures related to CORS policies and blocked API requests.
+
+Observed Issues:
+- CORS policy failures
+- Blocked preflight requests
+- HTTP 403 responses
+- Frontend rendering interruption
+
+Evidence:
+
+![Console Errors](screenshots/manual-evidence/04-console-errors.png)
+
+---
+
+## 05 — Network Investigation
+
+Description:
+
+Network analysis showed failed requests targeting Samsung staging commerce APIs.
+
+Observed Issues:
+- Failed commerce API requests
+- HTTP 403 responses
+- Blocked backend endpoints
+- Incomplete storefront rendering
+
+Evidence:
+
+![Network Errors](screenshots/manual-evidence/05-network-errors.png)
+
+---
+
+## 06 — Project Structure
+
+Description:
+
+Framework organization and Page Object Model architecture inside IntelliJ IDEA.
+
+Evidence:
+
+![Project Structure](screenshots/manual-evidence/06-project-structure.png)
+
+---
+
+## 07 — Test Execution
+
+Description:
+
+Execution logs and test runner behavior during automation execution.
+
+Evidence:
+
+![Test Execution](screenshots/manual-evidence/07-test-execution.png)
 
 ---
 
 # Environment Stability Findings
 
-During exploratory investigation, the staging environment presented instability related to frontend/backend integration.
+During exploratory investigation and automation execution, the staging environment presented instability related to frontend/backend communication.
 
 ## Observed Issues
 
-* Blank storefront rendering
-* CORS policy failures
-* 403 preflight request failures
-* Backend API communication failures
+- Blank storefront rendering
+- CORS policy failures
+- HTTP 403 preflight request failures
+- Blocked commerce API requests
+- Frontend rendering interruption
 
 ## Technical Observation
 
-Frontend API requests targeting:
+Requests targeting Samsung staging commerce APIs were blocked by access-control restrictions, preventing proper Angular storefront rendering.
+
+Observed failing endpoint examples included:
 
 ```text
 s2-smb-api-cdn.ecom-stg.samsung.com
 ```
 
-were rejected due to CORS/access-control failures.
-
-This prevented the Angular storefront from rendering correctly.
-
 ## Impact
 
-The Selenium framework itself remains functional.
+The Selenium framework itself remains functional and successfully executes:
 
-However, the unstable staging environment may temporarily prevent successful execution of the full checkout flow until backend services stabilize.
+- Session initialization
+- API-assisted cart setup
+- Screenshot capture
+- Test execution
+- Framework utilities
+- Logging
+- Failure handling
+
+Full checkout completion currently depends on staging environment stabilization and restoration of storefront API communication.
 
 ---
 
@@ -208,14 +319,14 @@ However, the unstable staging environment may temporarily prevent successful exe
 
 ## Why Use The Add-To-Cart API?
 
-Instead of automating product navigation manually, the provided add-to-cart endpoint is used to:
+Instead of automating product navigation manually, the provided add-to-cart endpoint was intentionally used to:
 
-* Reduce test execution time
-* Reduce UI flakiness
-* Focus automation efforts on checkout behavior
-* Improve stability
+- Reduce test execution time
+- Reduce UI flakiness
+- Improve test stability
+- Focus automation effort on checkout behavior
 
-This approach mirrors common enterprise automation strategies.
+This mirrors common enterprise automation practices.
 
 ---
 
@@ -223,11 +334,11 @@ This approach mirrors common enterprise automation strategies.
 
 Page Object Model was selected to:
 
-* Improve maintainability
-* Centralize locators
-* Reduce duplicated code
-* Improve readability
-* Support future scalability
+- Improve maintainability
+- Centralize locators
+- Reduce duplicated code
+- Improve readability
+- Improve scalability
 
 ---
 
@@ -237,9 +348,28 @@ The assignment explicitly mentioned support for parallel execution.
 
 Dynamic email generation prevents:
 
-* Duplicate-user conflicts
-* Session collisions
-* Data reuse problems
+- Duplicate user conflicts
+- Session collisions
+- Data reuse problems
+
+---
+
+# Assignment Requirements Coverage
+
+| Requirement                    | Status                |
+|--------------------------------|-----------------------|
+| Selenium automation framework  | Implemented           |
+| Guest checkout structure       | Implemented           |
+| Screenshot support             | Implemented           |
+| Dynamic email generation       | Implemented           |
+| Page Object Model              | Implemented           |
+| Add-to-cart API usage          | Implemented           |
+| Checkout flow structure        | Implemented           |
+| Order confirmation validation  | Structured            |
+| Order number capture           | Structured            |
+| Negative scenario preparation  | Implemented           |
+| Parallel execution preparation | Partially implemented |
+| Environment investigation      | Implemented           |
 
 ---
 
@@ -249,14 +379,14 @@ Dynamic email generation prevents:
 
 Install:
 
-* Java 17+ (or compatible installed version)
-* Maven
-* Google Chrome
-* IntelliJ IDEA (recommended)
+- Java 17+
+- Maven
+- Google Chrome
+- IntelliJ IDEA (recommended)
 
 ---
 
-# Clone Repository
+## Clone Repository
 
 ```bash
 git clone <repository-url>
@@ -264,7 +394,7 @@ git clone <repository-url>
 
 ---
 
-# Install Dependencies
+## Install Dependencies
 
 ```bash
 mvn clean install
@@ -272,49 +402,49 @@ mvn clean install
 
 ---
 
-# Run Tests
+## Run Tests
 
-## Run All Tests
+### Run All Tests
 
 ```bash
 mvn test
 ```
 
-## Run Specific Test
+### Run Specific Test
 
 ```bash
-mvn test -Dtest=SmokeTest
+mvn test -Dtest=CheckoutTest
 ```
 
 ---
 
-# Screenshots
+# Screenshots Folder
 
-Screenshots are automatically saved inside:
+Execution screenshots are automatically stored inside:
 
 ```text
 /screenshots
 ```
 
-Automatic screenshots are captured:
+Manual investigation screenshots are stored inside:
 
-* During execution
-* On failures
-* During important flow transitions
+```text
+/screenshots/manual-evidence
+```
 
 ---
 
 # Current Limitations
 
-The following items depend on staging environment availability:
+The following items currently depend on staging environment availability:
 
-* Final locator validation
-* Checkout flow stabilization
-* Payment iframe handling validation
-* Final order placement validation
-* Order number capture
+- Final locator refinement
+- Checkout stabilization
+- Payment iframe handling validation
+- Final order placement validation
+- Final order number capture
 
-Placeholder locators are currently used in some Page Objects until the storefront becomes stable again.
+Placeholder locators are temporarily used in some Page Objects until the storefront stabilizes again.
 
 ---
 
@@ -322,31 +452,14 @@ Placeholder locators are currently used in some Page Objects until the storefron
 
 Future improvements may include:
 
-* Parallel execution support
-* API validation layer
-* Better reporting integration
-* Negative checkout scenarios
-* Data-driven testing
-* Cross-browser execution
-* Headless execution toggle
-* CI/CD integration
-
----
-
-# Assignment Requirements Coverage
-
-| Requirement                    | Status                |
-| ------------------------------ | --------------------- |
-| Selenium automation framework  | Implemented           |
-| Guest checkout flow structure  | Implemented           |
-| Screenshot support             | Implemented           |
-| Dynamic email generation       | Implemented           |
-| Page Object Model              | Implemented           |
-| Configuration management       | Implemented           |
-| Checkout flow architecture     | Implemented           |
-| Order confirmation validation  | Structured            |
-| Negative scenario preparation  | Planned               |
-| Parallel execution preparation | Partially implemented |
+- Parallel execution support
+- Cross-browser execution
+- API validation layer
+- Data-driven testing
+- Headless execution toggle
+- Reporting integration
+- CI/CD integration
+- Enhanced negative scenarios
 
 ---
 
@@ -354,15 +467,16 @@ Future improvements may include:
 
 This project provided practical experience with:
 
-* Selenium automation
-* Framework architecture
-* Page Object Model
-* Maven dependency management
-* Browser automation
-* GitHub workflow
-* Staging environment investigation
-* Frontend/backend debugging
-* QA automation best practices
+- Selenium automation
+- Framework architecture
+- Page Object Model
+- Maven dependency management
+- Browser automation
+- GitHub workflow
+- Environment investigation
+- Frontend/backend debugging
+- Automation best practices
+- QA engineering mindset
 
 ---
 
@@ -370,10 +484,12 @@ This project provided practical experience with:
 
 Even with staging instability, the project successfully established:
 
-* A scalable automation architecture
-* Reusable utilities and abstractions
-* Structured checkout automation flow
-* Environment investigation documentation
-* Automation engineering foundations
+- A scalable automation framework
+- Structured Page Object architecture
+- Checkout automation flow
+- API-assisted cart initialization
+- Environment investigation documentation
+- Reusable automation utilities
+- Assignment requirement traceability
 
 The framework is prepared for rapid completion once the staging environment becomes stable again.
