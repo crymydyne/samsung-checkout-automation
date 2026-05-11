@@ -389,7 +389,7 @@ Install:
 ## Clone Repository
 
 ```bash
-git clone <repository-url>
+git clone https://wwww.github.com/crymydyne/samsung-checkout-automation
 ```
 
 ---
