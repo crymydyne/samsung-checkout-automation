@@ -479,7 +479,13 @@ This project provided practical experience with:
 - QA engineering mindset
 
 ---
+## Environment Note
 
+During development and execution, the Samsung staging storefront experienced intermittent backend/API instability, including CORS and HTTP 403 failures affecting storefront rendering.
+
+Despite these environment limitations, the automation framework architecture, execution flow, investigation process, and supporting utilities were fully implemented and documented.
+
+---
 # Final Notes
 
 Even with staging instability, the project successfully established:
@@ -493,3 +499,4 @@ Even with staging instability, the project successfully established:
 - Assignment requirement traceability
 
 The framework is prepared for rapid completion once the staging environment becomes stable again.
+
