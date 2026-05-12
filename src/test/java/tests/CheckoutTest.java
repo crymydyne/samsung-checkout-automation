@@ -6,7 +6,10 @@ import models.TestCardData;
 import models.TestCustomerData;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-import pages.*;
+import pages.CartPage;
+import pages.CheckoutPage;
+import pages.ConfirmationPage;
+import pages.GuestPage;
 import utils.ScreenshotUtils;
 import utils.TestDataGenerator;
 
@@ -36,13 +39,7 @@ public class CheckoutTest extends BaseTest {
 
         cartPage.waitUntilCartIsLoaded();
 
-        ScreenshotUtils.takeScreenshot(
-                driver,
-                "03-cart-page"
-        );
-
-        System.out.println("Cart page text:");
-        System.out.println(cartPage.getCartText());
+        ScreenshotUtils.takeScreenshot(driver, "03-cart-page");
 
         Assert.assertTrue(
                 cartPage.isCartLoaded(),
@@ -63,13 +60,7 @@ public class CheckoutTest extends BaseTest {
 
         guestPage.waitUntilGuestPageIsLoaded();
 
-        ScreenshotUtils.takeScreenshot(
-                driver,
-                "04-guest-page"
-        );
-
-        System.out.println("Guest page text:");
-        System.out.println(guestPage.getGuestPageText());
+        ScreenshotUtils.takeScreenshot(driver, "04-guest-page");
 
         Assert.assertTrue(
                 guestPage.isGuestPageLoaded(),
@@ -79,9 +70,7 @@ public class CheckoutTest extends BaseTest {
         String email =
                 TestDataGenerator.generateUniqueEmail();
 
-        System.out.println(
-                "Generated guest email: " + email
-        );
+        System.out.println("Generated guest email: " + email);
 
         guestPage.enterEmail(email);
 
@@ -92,13 +81,7 @@ public class CheckoutTest extends BaseTest {
 
         checkoutPage.waitUntilCheckoutPageIsLoaded();
 
-        ScreenshotUtils.takeScreenshot(
-                driver,
-                "05-checkout-personal-info"
-        );
-
-        System.out.println("Checkout page text:");
-        System.out.println(checkoutPage.getCheckoutPageText());
+        ScreenshotUtils.takeScreenshot(driver, "05-checkout-personal-info");
 
         Assert.assertTrue(
                 checkoutPage.isCheckoutPageLoaded(),
@@ -142,6 +125,7 @@ public class CheckoutTest extends BaseTest {
         System.out.println("STEP: Accepting required terms");
 
         checkoutPage.acceptRequiredTerms();
+
         ScreenshotUtils.takeScreenshot(driver, "08-terms-accepted");
 
         checkoutPage.continueToPayment();
@@ -153,9 +137,13 @@ public class CheckoutTest extends BaseTest {
                 "Payment section was not displayed."
         );
 
-        System.out.println("STEP: Filling payment information");
+        System.out.println("STEP: Selecting credit/debit card payment");
 
         checkoutPage.selectCreditCardPayment();
+
+        ScreenshotUtils.takeScreenshot(driver, "10-credit-card-opened");
+
+        System.out.println("STEP: Filling payment information");
 
         checkoutPage.enterCardDetails(
                 TestCardData.CARD_NUMBER,
@@ -164,22 +152,26 @@ public class CheckoutTest extends BaseTest {
                 TestCardData.CVV
         );
 
-        ScreenshotUtils.takeScreenshot(driver, "09-payment-filled");
+        ScreenshotUtils.takeScreenshot(driver, "11-payment-filled");
 
         System.out.println("STEP: Placing order");
 
         checkoutPage.placeOrder();
 
-        ScreenshotUtils.takeScreenshot(driver, "10-after-place-order");
+        ScreenshotUtils.takeScreenshot(driver, "12-after-place-order");
 
-        ConfirmationPage confirmationPage = new ConfirmationPage(driver);
+        ConfirmationPage confirmationPage =
+                new ConfirmationPage(driver);
+
+        confirmationPage.waitUntilConfirmationPageIsLoaded();
 
         Assert.assertTrue(
                 confirmationPage.isOrderSuccessful(),
                 "Order confirmation was not displayed."
         );
 
-        String orderNumber = confirmationPage.getOrderNumber();
+        String orderNumber =
+                confirmationPage.getOrderNumber();
 
         System.out.println("Generated Order Number: " + orderNumber);
 
@@ -188,6 +180,6 @@ public class CheckoutTest extends BaseTest {
                 "Order number was not generated."
         );
 
-        ScreenshotUtils.takeScreenshot(driver, "11-order-confirmation");
+        ScreenshotUtils.takeScreenshot(driver, "13-order-confirmation");
     }
 }

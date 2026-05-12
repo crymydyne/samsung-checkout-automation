@@ -3,7 +3,7 @@ package models;
 public class TestCardData {
 
     public static final String CARD_NUMBER =
-            "5031755734530604";
+            "5031 7557 3453 0604";
 
     public static final String CARDHOLDER_NAME =
             "APRO";
