@@ -17,114 +17,117 @@ public class CheckoutTest extends BaseTest {
 
         System.out.println("STEP: Initializing session");
 
-        driver.get(
-                ConfigReader.getProperty("cookie.url")
-        );
+        driver.get(ConfigReader.getProperty("cookie.url"));
 
-        ScreenshotUtils.takeScreenshot(
-                driver,
-                "01-cookie-page"
-        );
+        ScreenshotUtils.takeScreenshot(driver, "01-cookie-page");
 
         System.out.println("STEP: Adding product to cart");
 
-        driver.get(
-                ConfigReader.getProperty("add.to.cart.url")
-        );
+        driver.get(ConfigReader.getProperty("add.to.cart.url"));
 
-        ScreenshotUtils.takeScreenshot(
-                driver,
-                "02-product-added"
-        );
+        ScreenshotUtils.takeScreenshot(driver, "02-product-added");
 
         System.out.println("STEP: Opening cart page");
 
-        driver.get(
-                ConfigReader.getProperty("cart.url")
-        );
+        driver.get(ConfigReader.getProperty("cart.url"));
+
+        CartPage cartPage =
+                new CartPage(driver);
+
+        cartPage.waitUntilCartIsLoaded();
 
         ScreenshotUtils.takeScreenshot(
                 driver,
                 "03-cart-page"
         );
 
-        CartPage cartPage =
-                new CartPage(driver);
+        System.out.println("Cart page text:");
+        System.out.println(cartPage.getCartText());
 
         Assert.assertTrue(
-                cartPage.isProductInCart(
-                        "RB45DG6300B1PE"
-                ),
+                cartPage.isCartLoaded(),
+                "Cart page did not load correctly."
+        );
+
+        Assert.assertTrue(
+                cartPage.isProductInCart("RB45DG6300B1PE"),
                 "SKU was not found in cart."
         );
 
-        System.out.println("STEP: Proceeding to checkout");
+        System.out.println("STEP: Proceeding to guest identification");
 
         cartPage.clickContinue();
+
+        GuestPage guestPage =
+                new GuestPage(driver);
+
+        guestPage.waitUntilGuestPageIsLoaded();
 
         ScreenshotUtils.takeScreenshot(
                 driver,
                 "04-guest-page"
         );
 
-        GuestPage guestPage =
-                new GuestPage(driver);
+        System.out.println("Guest page text:");
+        System.out.println(guestPage.getGuestPageText());
+
+        Assert.assertTrue(
+                guestPage.isGuestPageLoaded(),
+                "Guest identification page did not load."
+        );
 
         String email =
                 TestDataGenerator.generateUniqueEmail();
 
         System.out.println(
-                "Generated email: " + email
+                "Generated guest email: " + email
         );
 
         guestPage.enterEmail(email);
 
         guestPage.continueAsGuest();
 
-        ScreenshotUtils.takeScreenshot(
-                driver,
-                "05-checkout-page"
-        );
-
         CheckoutPage checkoutPage =
                 new CheckoutPage(driver);
 
-        System.out.println(
-                "STEP: Filling personal information"
+        checkoutPage.waitUntilCheckoutPageIsLoaded();
+
+        ScreenshotUtils.takeScreenshot(
+                driver,
+                "05-checkout-personal-info"
         );
 
-        checkoutPage.fillPersonalInformation(
-                TestCustomerData.FULL_NAME,
-                TestCustomerData.PHONE
+        System.out.println("Checkout page text:");
+        System.out.println(checkoutPage.getCheckoutPageText());
+
+        Assert.assertTrue(
+                checkoutPage.isCheckoutPageLoaded(),
+                "Checkout page did not load."
         );
+
+        System.out.println("STEP: Filling personal information");
+
+        checkoutPage.fillPersonalInformation(
+                TestCustomerData.FIRST_NAME,
+                TestCustomerData.LAST_NAME,
+                TestCustomerData.PHONE,
+                TestCustomerData.DOCUMENT_NUMBER
+        );
+
+        checkoutPage.continueFromPersonalInformation();
+
+        ScreenshotUtils.takeScreenshot(driver, "06-delivery-section");
 
         Assert.assertTrue(
                 checkoutPage.isAddressSectionEnabled(),
-                "Address section was not enabled."
+                "Delivery address section was not enabled."
         );
 
-        ScreenshotUtils.takeScreenshot(
-                driver,
-                "06-personal-information"
-        );
+        System.out.println("STEP: Filling delivery address");
 
-        System.out.println(
-                "STEP: Filling address information"
-        );
-
-        checkoutPage.fillAddress(
+        checkoutPage.fillDeliveryAddress(
                 TestCustomerData.ADDRESS,
-                TestCustomerData.CITY,
-                TestCustomerData.ZIP
-        );
-
-        ScreenshotUtils.takeScreenshot(
-                driver,
-                "07-address-information"
-        );
-
-        System.out.println(
-                "STEP: Selecting delivery mode"
+                TestCustomerData.STREET_NUMBER
         );
 
         checkoutPage.selectDeliveryMode();
@@ -134,59 +137,57 @@ public class CheckoutTest extends BaseTest {
                 "Delivery mode was not selected."
         );
 
-        ScreenshotUtils.takeScreenshot(
-                driver,
-                "08-delivery-mode"
+        ScreenshotUtils.takeScreenshot(driver, "07-delivery-mode-selected");
+
+        System.out.println("STEP: Accepting required terms");
+
+        checkoutPage.acceptRequiredTerms();
+        ScreenshotUtils.takeScreenshot(driver, "08-terms-accepted");
+
+        checkoutPage.continueToPayment();
+
+        ScreenshotUtils.takeScreenshot(driver, "09-payment-section");
+
+        Assert.assertTrue(
+                checkoutPage.isPaymentSectionVisible(),
+                "Payment section was not displayed."
         );
 
-        PaymentPage paymentPage =
-                new PaymentPage(driver);
+        System.out.println("STEP: Filling payment information");
 
-        System.out.println(
-                "STEP: Entering payment information"
-        );
+        checkoutPage.selectCreditCardPayment();
 
-        paymentPage.enterCardDetails(
+        checkoutPage.enterCardDetails(
                 TestCardData.CARD_NUMBER,
+                TestCardData.CARDHOLDER_NAME,
                 TestCardData.EXPIRATION,
                 TestCardData.CVV
         );
 
-        ScreenshotUtils.takeScreenshot(
-                driver,
-                "09-payment-page"
-        );
+        ScreenshotUtils.takeScreenshot(driver, "09-payment-filled");
 
-        System.out.println(
-                "STEP: Placing order"
-        );
+        System.out.println("STEP: Placing order");
 
-        paymentPage.placeOrder();
+        checkoutPage.placeOrder();
 
-        ConfirmationPage confirmationPage =
-                new ConfirmationPage(driver);
+        ScreenshotUtils.takeScreenshot(driver, "10-after-place-order");
+
+        ConfirmationPage confirmationPage = new ConfirmationPage(driver);
 
         Assert.assertTrue(
                 confirmationPage.isOrderSuccessful(),
                 "Order confirmation was not displayed."
         );
 
-        String orderNumber =
-                confirmationPage.getOrderNumber();
+        String orderNumber = confirmationPage.getOrderNumber();
 
-        System.out.println(
-                "Generated Order Number: "
-                        + orderNumber
-        );
+        System.out.println("Generated Order Number: " + orderNumber);
 
         Assert.assertFalse(
                 orderNumber.isEmpty(),
                 "Order number was not generated."
         );
 
-        ScreenshotUtils.takeScreenshot(
-                driver,
-                "10-order-confirmation"
-        );
+        ScreenshotUtils.takeScreenshot(driver, "11-order-confirmation");
     }
 }
