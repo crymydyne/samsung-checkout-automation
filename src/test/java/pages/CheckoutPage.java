@@ -517,34 +517,6 @@ public class CheckoutPage extends BasePage {
         }
     }
 
-    public void printVisiblePaymentInputs() {
-
-        Object result =
-                ((JavascriptExecutor) driver)
-                        .executeScript(
-                                "const inputs = Array.from(document.querySelectorAll('input'));" +
-                                        "return inputs.map((input, index) => {" +
-                                        "  const rect = input.getBoundingClientRect();" +
-                                        "  const type = input.getAttribute('type');" +
-                                        "  const placeholder = input.getAttribute('placeholder');" +
-                                        "  const name = input.getAttribute('name');" +
-                                        "  const value = input.value;" +
-                                        "  const visible = rect.width > 40 && rect.height > 10;" +
-                                        "  return index + ' | visible=' + visible" +
-                                        "    + ' | type=' + type" +
-                                        "    + ' | placeholder=' + placeholder" +
-                                        "    + ' | name=' + name" +
-                                        "    + ' | value=' + value" +
-                                        "    + ' | top=' + rect.top" +
-                                        "    + ' | left=' + rect.left" +
-                                        "    + ' | width=' + rect.width;" +
-                                        "}).join('\\n');"
-                        );
-
-        System.out.println("VISIBLE PAYMENT INPUT DEBUG:");
-        System.out.println(result);
-    }
-
     public void enterCardDetails(
             String cardNumber,
             String cardholderName,
